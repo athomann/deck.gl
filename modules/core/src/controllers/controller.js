@@ -216,7 +216,14 @@ export default class Controller {
 
   // Private Methods
 
-  /* Callback util */
+  setState = (newState) => {
+    Object.assign(this._state, newState);
+    if (this.onStateChange) {
+      this.onStateChange(this._state);
+    }
+  };
+
+   /* Callback util */
   // formats map state and invokes callback function
   updateViewport(newControllerState, extraProps = {}, interactionState = {}) {
     const viewState = Object.assign({}, newControllerState.getViewportProps(), extraProps);
@@ -334,7 +341,14 @@ export default class Controller {
       isZooming: true,
       isPanning: true
     });
+
+    // Wheel events are discrete, let's wait a little before resetting isZooming
+    this._onWheelEnd();
     return true;
+  }
+
+  _onWheelEnd() {
+    this.setState({isZooming: false});
   }
 
   // Default handler for the `pinchstart` event.
